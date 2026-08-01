@@ -21,14 +21,25 @@ export function buildTOC(sections) {
   });
 }
 
+const PERIODICAL_PATTERN = /,\s*\d+(\(\d+\))?(,|$)/;
+
+export function isPeriodicalSource(source) {
+  return PERIODICAL_PATTERN.test(source);
+}
+
 export function formatReference(ref) {
   for (const field of REFERENCE_FIELDS) {
     if (!ref[field]) {
       throw new Error(`missing ${field}`);
     }
   }
+  const periodical = isPeriodicalSource(ref.source);
   return {
-    text: `${ref.authors} (${ref.year}). ${ref.title}. ${ref.source}.`,
+    authorYear: `${ref.authors} (${ref.year}).`,
+    title: `${ref.title}.`,
+    titleItalic: !periodical,
+    source: `${ref.source}.`,
+    sourceItalic: periodical,
     url: ref.url ?? null,
   };
 }
