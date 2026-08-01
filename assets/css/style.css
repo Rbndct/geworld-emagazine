@@ -313,6 +313,17 @@ svg {
 .section p {
   margin: 0 0 1.25rem;
   font-size: 1.05rem;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+@media (max-width: 30rem) {
+  .section p {
+    text-align: left;
+    hyphens: none;
+    -webkit-hyphens: none;
+  }
 }
 
 .section p:first-of-type::first-letter {
@@ -398,9 +409,15 @@ svg {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.9rem;
+  gap: 1rem;
   font-size: 0.92rem;
   color: var(--paper-dim);
+}
+
+.references__item {
+  padding-left: 2em;
+  text-indent: -2em;
+  line-height: 1.6;
 }
 
 .references__list a {
