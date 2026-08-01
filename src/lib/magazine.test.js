@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   slugify,
   buildTOC,
+  isPeriodicalSource,
   formatReference,
   truncateForTeaser,
   validateIssue,
@@ -48,8 +49,28 @@ describe('buildTOC', () => {
   });
 });
 
+describe('isPeriodicalSource', () => {
+  it('recognizes a journal name with volume and issue', () => {
+    assert.equal(isPeriodicalSource('Internet Policy Review, 10(2)'), true);
+  });
+
+  it('recognizes a journal name with volume, issue, and pages', () => {
+    assert.equal(isPeriodicalSource('Washington University Global Studies Law Review, 21(2), 273–'), true);
+  });
+
+  it('recognizes a journal name with a volume but no issue number', () => {
+    assert.equal(isPeriodicalSource('Journal of Information Policy, 14, 417–470'), true);
+  });
+
+  it('treats a bare organization or site name as non-periodical', () => {
+    assert.equal(isPeriodicalSource('GMA News Online'), false);
+    assert.equal(isPeriodicalSource('Freedom House'), false);
+    assert.equal(isPeriodicalSource('Encyclopedia Britannica'), false);
+  });
+});
+
 describe('formatReference', () => {
-  it('formats an author/year/title/source reference with a link when url present', () => {
+  it('italicizes the source (journal + volume/issue) for a periodical reference', () => {
     const ref = {
       authors: 'Gray, J. E.',
       year: '2021',
@@ -58,15 +79,41 @@ describe('formatReference', () => {
       url: 'https://doi.org/10.14763/2021.2.1557',
     };
     assert.deepEqual(formatReference(ref), {
-      text: "Gray, J. E. (2021). The geopolitics of 'platforms': The TikTok challenge. Internet Policy Review, 10(2).",
+      authorYear: 'Gray, J. E. (2021).',
+      title: "The geopolitics of 'platforms': The TikTok challenge.",
+      titleItalic: false,
+      source: 'Internet Policy Review, 10(2).',
+      sourceItalic: true,
       url: 'https://doi.org/10.14763/2021.2.1557',
+    });
+  });
+
+  it('italicizes the title (not the source) for a standalone reference', () => {
+    const ref = {
+      authors: 'GMA News Online',
+      year: '2023',
+      title: 'NSA Año: PH TikTok ban possible if app proven to be used for espionage',
+      source: 'GMA News Online',
+      url: 'https://example.com/story',
+    };
+    assert.deepEqual(formatReference(ref), {
+      authorYear: 'GMA News Online (2023).',
+      title: 'NSA Año: PH TikTok ban possible if app proven to be used for espionage.',
+      titleItalic: true,
+      source: 'GMA News Online.',
+      sourceItalic: false,
+      url: 'https://example.com/story',
     });
   });
 
   it('omits url when not present', () => {
     const ref = { authors: 'Wang, J.', year: '2020', title: 'From banning to regulating TikTok', source: 'Centre for Socio-Legal Studies' };
     assert.deepEqual(formatReference(ref), {
-      text: 'Wang, J. (2020). From banning to regulating TikTok. Centre for Socio-Legal Studies.',
+      authorYear: 'Wang, J. (2020).',
+      title: 'From banning to regulating TikTok.',
+      titleItalic: true,
+      source: 'Centre for Socio-Legal Studies.',
+      sourceItalic: false,
       url: null,
     });
   });
