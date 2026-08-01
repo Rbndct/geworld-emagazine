@@ -76,6 +76,13 @@ issue.sections.forEach((section, index) => {
   sectionsRoot.append(el);
 });
 
+function referenceNode(text, italic) {
+  if (!italic) return document.createTextNode(text);
+  const em = document.createElement('em');
+  em.textContent = text;
+  return em;
+}
+
 const referencesList = document.getElementById('references-list');
 issue.references
   .slice()
@@ -83,17 +90,22 @@ issue.references
   .forEach((ref) => {
     const formatted = formatReference(ref);
     const li = document.createElement('li');
+    li.className = 'references__item';
 
+    const container = formatted.url ? document.createElement('a') : document.createElement('span');
     if (formatted.url) {
-      const a = document.createElement('a');
-      a.href = formatted.url;
-      a.target = '_blank';
-      a.rel = 'noopener noreferrer';
-      a.textContent = formatted.text;
-      li.append(a);
-    } else {
-      li.textContent = formatted.text;
+      container.href = formatted.url;
+      container.target = '_blank';
+      container.rel = 'noopener noreferrer';
     }
 
+    container.append(
+      document.createTextNode(`${formatted.authorYear} `),
+      referenceNode(formatted.title, formatted.titleItalic),
+      document.createTextNode(' '),
+      referenceNode(formatted.source, formatted.sourceItalic)
+    );
+
+    li.append(container);
     referencesList.append(li);
   });
