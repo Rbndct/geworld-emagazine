@@ -1,7 +1,6 @@
 import { issue } from '../../src/content.js';
 import { buildTOC, truncateForTeaser } from '../../src/lib/magazine.js';
 
-document.getElementById('hero-kicker').textContent = issue.tab;
 document.getElementById('hero-title').textContent = issue.title;
 document.getElementById('hero-dek').textContent = truncateForTeaser(issue.dek, 220);
 
