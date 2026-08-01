@@ -1,55 +1,55 @@
 import { computeReadingProgress, staggerDelay } from '../../src/lib/motion.js';
 
-const revealTargets = document.querySelectorAll('.toc__item, .section, .pull-quote, .sidebar');
+const revealTargets = Array.from(
+  document.querySelectorAll('.toc__item, .section, .pull-quote, .sidebar')
+);
 
 revealTargets.forEach((el, index) => {
   el.setAttribute('data-reveal', '');
   el.style.transitionDelay = `${staggerDelay(index, { baseMs: 40, maxMs: 400 })}ms`;
 });
 
-if (revealTargets.length > 0 && 'IntersectionObserver' in window) {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    },
-    { threshold: 0.15 }
-  );
+let pendingReveal = revealTargets.slice();
 
-  revealTargets.forEach((el) => observer.observe(el));
+function revealInView() {
+  pendingReveal = pendingReveal.filter((el) => {
+    const rect = el.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight && rect.bottom > 0;
+    if (inView) el.classList.add('is-visible');
+    return !inView;
+  });
 }
 
 const sectionsRoot = document.getElementById('sections');
-if (sectionsRoot) {
-  const bar = document.createElement('div');
-  bar.className = 'progress-bar';
-  document.body.prepend(bar);
+const progressBar = sectionsRoot ? document.createElement('div') : null;
+if (progressBar) {
+  progressBar.className = 'progress-bar';
+  document.body.prepend(progressBar);
+}
 
-  let ticking = false;
-  const updateProgress = () => {
+let ticking = false;
+
+function onFrame() {
+  revealInView();
+  if (progressBar) {
     const progress = computeReadingProgress(
       window.scrollY,
       document.documentElement.scrollHeight,
       window.innerHeight
     );
-    bar.style.width = `${progress}%`;
-    ticking = false;
-  };
-
-  window.addEventListener(
-    'scroll',
-    () => {
-      if (!ticking) {
-        requestAnimationFrame(updateProgress);
-        ticking = true;
-      }
-    },
-    { passive: true }
-  );
-
-  updateProgress();
+    progressBar.style.width = `${progress}%`;
+  }
+  ticking = false;
 }
+
+function requestFrame() {
+  if (!ticking) {
+    requestAnimationFrame(onFrame);
+    ticking = true;
+  }
+}
+
+window.addEventListener('scroll', requestFrame, { passive: true });
+window.addEventListener('resize', requestFrame);
+
+if (revealTargets.length > 0 || progressBar) requestFrame();
