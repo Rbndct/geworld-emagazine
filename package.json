@@ -1,0 +1,12 @@
+{
+  "name": "geworld-emagazine",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "GEWORLD digital e-magazine (international studies)",
+  "scripts": {
+    "test": "node --test src/lib",
+    "test:coverage": "node --experimental-test-coverage --test src/lib",
+    "serve": "node scripts/dev-server.js"
+  }
+}
