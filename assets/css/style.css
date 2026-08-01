@@ -15,6 +15,9 @@
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
   --max-w: 44rem;
   --max-w-wide: 72rem;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 180ms;
+  --duration-normal: 320ms;
 }
 
 @media (prefers-color-scheme: light) {
@@ -34,6 +37,7 @@
 
 html {
   color-scheme: dark light;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -49,6 +53,7 @@ a {
   color: var(--accent-cyan);
   text-decoration-color: var(--line-soft);
   text-underline-offset: 3px;
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 a:hover {
@@ -120,6 +125,12 @@ svg {
   inset: 0;
   opacity: 0.55;
   pointer-events: none;
+  animation: hero-drift 18s ease-in-out infinite;
+}
+
+@keyframes hero-drift {
+  0%, 100% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.03) translate(-0.5%, 0.5%); }
 }
 
 .hero__content {
@@ -163,12 +174,15 @@ svg {
   font-family: var(--font-mono);
   font-size: 0.85rem;
   letter-spacing: 0.06em;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 
 .hero__cta:hover {
   background: var(--paper);
   color: var(--ink);
+  transform: translateX(3px);
 }
 
 /* ---------- Table of contents ---------- */
@@ -206,10 +220,23 @@ svg {
   padding: 1.1rem 0.25rem;
   text-decoration: none;
   color: var(--paper);
+  transition: color var(--duration-fast) var(--ease-out),
+    padding-left var(--duration-fast) var(--ease-out);
 }
 
-.toc__link:hover {
+.toc__link:hover,
+.toc__link:focus-visible {
   color: var(--accent-cyan);
+  padding-left: 0.6rem;
+}
+
+.toc__index {
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.toc__link:hover .toc__index,
+.toc__link:focus-visible .toc__index {
+  color: var(--accent-pink);
 }
 
 .toc__index {
@@ -378,9 +405,11 @@ svg {
 
 .references__list a {
   color: var(--paper-dim);
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
-.references__list a:hover {
+.references__list a:hover,
+.references__list a:focus-visible {
   color: var(--accent-cyan);
 }
 
@@ -401,5 +430,60 @@ svg {
 @media (max-width: 40rem) {
   .section p:first-of-type::first-letter {
     font-size: 2.6rem;
+  }
+}
+
+/* ---------- Reveal-on-scroll ---------- */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- Reading progress bar ---------- */
+
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink));
+  z-index: 1000;
+  transition: width 80ms linear;
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero__art {
+    animation: none;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .progress-bar {
+    transition: none;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
