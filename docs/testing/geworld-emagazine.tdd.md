@@ -10,6 +10,10 @@
 4. As a reader, I want a short teaser excerpt on the cover derived from the article body, so I get a preview before clicking in.
 5. As a reader, I want the interface to feel alive when browsing/clicking (scroll-reveal, a reading progress bar, smoother hover states), so long-form reading feels less static — added per the `/plan` → `/goal` request "add motion / make the interfaces more interactive."
 6. As a reader who is sensitive to motion, I want all of the above disabled when `prefers-reduced-motion: reduce` is set, so the site doesn't cause discomfort.
+7. As a reader, I want long body paragraphs justified with hyphenation (falling back to left-align on narrow phones) so the article reads like a typeset magazine, not a raw text dump.
+8. As a reader checking sources, I want the reference list to look like a real APA 7th-edition list: hanging indent, and italics on the correct segment (journal + volume for periodicals, the work's own title for standalone sources like news sites or reports).
+9. As a reader, I want the "Tab 3" internal label gone from the public landing page (it stays on the article page itself, where it functions as a section kicker).
+10. As a reader, I want the article's subtitle to read as naturally written, not machine-generated — the one AI tell (an em dash) was removed via the `/humanizer` skill.
 
 ## Task report
 
@@ -24,6 +28,9 @@
 | `clamp` / `computeReadingProgress` / `staggerDelay` | Pure math for the reveal stagger and reading-progress bar | `npm test` | RED (`ERR_MODULE_NOT_FOUND`) → GREEN (12/12 pass) |
 | `assets/js/motion.js` scroll-reveal | Bounding-rect check re-run on every scroll/resize frame, not a one-shot `IntersectionObserver` crossing | Playwright: jumped to bottom, confirmed sections above the fold stayed pending; scrolled back up, confirmed they revealed correctly | PASS after a design fix (see below) |
 | `prefers-reduced-motion: reduce` | All motion collapses to instant/static | `page.emulateMedia({ reducedMotion: 'reduce' })` via Playwright | PASS — opacity 1 immediately, transition duration ~0, `scroll-behavior: auto` |
+| `isPeriodicalSource` / restructured `formatReference` | Classifies a reference as periodical (italicize journal+volume) vs. standalone (italicize the work's own title) | `npm test` | RED (missing export) → GREEN (37/37 pass, all 16 real references classified with exactly one italic segment) |
+| Justified body text + hanging-indent references | Visual typography verified against the real content | Playwright: computed style checks on live pages | PASS — `.section p` is `justify`/`hyphens:auto` on desktop, falls back to `left` under 30rem; Gray (periodical) reference italicizes `"Internet Policy Review, 10(2)."`; Rhoden-Paul/BBC (standalone) reference italicizes the title instead; both show `text-indent: -29.44px` hanging indent |
+| Landing-page kicker removal | "Tab 3" removed from `index.html` hero, unchanged on the article page | Playwright accessibility snapshot | PASS — cover hero no longer contains "Tab 3"; article page's `#article-kicker` still reads "Tab 3" |
 
 ## Test specification
 
@@ -41,8 +48,12 @@
 | 10 | `clamp` bounds a value to `[min, max]` on both sides | `src/lib/motion.test.js` | unit | PASS |
 | 11 | `computeReadingProgress` returns 0 at the top, 100 at the bottom, a proportional value between, 100 when content is shorter than the viewport, and clamps out-of-range input | `src/lib/motion.test.js` | unit | PASS |
 | 12 | `staggerDelay` scales linearly with index and caps at `maxMs`, with sensible defaults | `src/lib/motion.test.js` | unit | PASS |
+| 13 | `isPeriodicalSource` recognizes "Name, Vol(Issue)" and "Name, Vol, pages" patterns as periodical; bare org/site names as non-periodical | `src/lib/magazine.test.js` | unit | PASS |
+| 14 | `formatReference` italicizes the source for a periodical, the title for a standalone reference, with correct punctuation on each segment | `src/lib/magazine.test.js` | unit | PASS |
+| 15 | Every real reference formats with exactly one italic segment (title XOR source), never both or neither | `src/content.test.js` | integration | PASS |
+| 16 | The real content contains at least one periodical and one standalone reference (the classifier isn't vacuously true/false) | `src/content.test.js` | integration | PASS |
 
-Evidence: `npm test` → `# tests 31 / # pass 31 / # fail 0`.
+Evidence: `npm test` → `# tests 37 / # pass 37 / # fail 0`.
 
 ## Coverage
 
@@ -51,14 +62,14 @@ npm run test:coverage
 file                     | line % | branch % | funcs % | uncovered lines
 src/content.js           | 100.00 |   100.00 |  100.00 |
 src/content.test.js      | 100.00 |   100.00 |  100.00 |
-src/lib/magazine.js      | 100.00 |    96.00 |  100.00 |
+src/lib/magazine.js      | 100.00 |    96.15 |  100.00 |
 src/lib/magazine.test.js | 100.00 |   100.00 |  100.00 |
 src/lib/motion.js        | 100.00 |   100.00 |  100.00 |
 src/lib/motion.test.js   | 100.00 |   100.00 |  100.00 |
-all files                | 100.00 |    98.72 |  100.00 |
+all files                | 100.00 |    98.85 |  100.00 |
 ```
 
-Well above the 80% bar. The 96% branch figure on `magazine.js` is the `lastSpace > 0` false-branch fallback in `truncateForTeaser` for text with no space in the truncation window — an intentionally minor, low-risk edge not worth a dedicated test.
+Well above the 80% bar. The <4% branch gap on `magazine.js` is the `lastSpace > 0` false-branch fallback in `truncateForTeaser` for text with no space in the truncation window — an intentionally minor, low-risk edge not worth a dedicated test.
 
 ## Known gaps (intentional)
 
