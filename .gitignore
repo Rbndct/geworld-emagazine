@@ -1,3 +1,6 @@
 node_modules/
 .DS_Store
 coverage/
+.playwright-mcp/
+cover.png
+docs/memory/
