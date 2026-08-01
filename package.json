@@ -5,8 +5,8 @@
   "type": "module",
   "description": "GEWORLD digital e-magazine (international studies)",
   "scripts": {
-    "test": "node --test src/lib",
-    "test:coverage": "node --experimental-test-coverage --test src/lib",
+    "test": "node --test src",
+    "test:coverage": "node --experimental-test-coverage --test src",
     "serve": "node scripts/dev-server.js"
   }
 }
