@@ -1,9 +1,9 @@
-# GEWORLD — International Studies E-Magazine
+# Contemporary World: Z32 GEWORLD
 
-A creative, editorial e-magazine for GEWORLD (international studies). Currently
-publishes one issue — *Geopolitics of Social Media Platforms* — sourced from
-`GEWORLD content (1).md`. Built as zero-build static HTML/CSS/JS so it runs
-unmodified on GitHub Pages and Vercel.
+A creative, editorial e-magazine for Contemporary World (Z32 GEWORLD, international
+studies). It currently publishes one issue, *Geopolitics of Social Media Platforms*,
+sourced from `GEWORLD content (1).md`. It's built as zero-build static HTML/CSS/JS,
+so it runs unmodified on GitHub Pages and Vercel.
 
 ## Structure
 
@@ -22,8 +22,8 @@ scripts/dev-server.js            zero-dependency local static server
 ## Adding a future issue
 
 Add a new `issue`-shaped object (see `src/content.js` for the shape) and a new
-page under `issues/`. `validateIssue()` in `src/lib/magazine.js` will tell you
-if required fields are missing.
+page under `issues/`. `validateIssue()` in `src/lib/magazine.js` tells you if
+required fields are missing.
 
 ## Local preview
 
@@ -32,7 +32,7 @@ npm run serve
 # open http://localhost:4173
 ```
 
-A local server is required because the pages load `<script type="module">` —
+You need a local server because the pages load `<script type="module">`, and
 browsers block ES module imports over `file://`.
 
 ## Tests
@@ -47,17 +47,18 @@ npm run test:coverage # with coverage report
 ### GitHub Pages
 
 1. Push this repository to GitHub.
-2. In the repo settings, go to **Pages** → **Build and deployment** → **Source**
-   → select **Deploy from a branch**, branch `main`, folder `/ (root)`.
+2. In the repo settings, go to **Pages** → **Build and deployment** → **Source**,
+   then select **Deploy from a branch**, branch `main`, folder `/ (root)`.
 3. Save. The site publishes at `https://<username>.github.io/<repo>/`.
 
-No build step is required — the repo root already contains `index.html`.
+The repo root already contains `index.html`, so no build step is needed.
 
 ### Vercel
 
 1. Import the repository at [vercel.com/new](https://vercel.com/new).
-2. Framework preset: **Other** (static site). Leave build command empty and
-   output directory as `.` (root) — Vercel serves the static files directly.
+2. Framework preset: **Other** (static site). Leave the build command empty
+   and the output directory as `.` (root); Vercel serves the static files
+   directly.
 3. Deploy.
 
-Both hosts serve the same files with no per-host configuration needed.
+Both hosts serve the same files, and neither needs per-host configuration.

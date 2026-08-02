@@ -1,7 +1,6 @@
 import { issue } from '../../src/content.js';
 import { buildTOC, formatReference } from '../../src/lib/magazine.js';
 
-document.getElementById('article-kicker').textContent = issue.tab;
 document.getElementById('article-title').textContent = issue.title;
 document.getElementById('article-dek').textContent = issue.dek;
 

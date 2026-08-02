@@ -1,7 +1,6 @@
 export const issue = {
   title: 'Geopolitics of Social Media Platforms',
   slug: 'tiktok-geopolitics',
-  tab: 'Tab 3',
   dek: 'How TikTok became the battleground for a US-China contest over who controls the future of digital platforms, and what that means for allies like the Philippines.',
   mainArticleUrl:
     'https://policyreview.info/articles/analysis/geopolitics-platforms-tiktok-challenge',

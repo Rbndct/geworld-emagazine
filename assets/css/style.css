@@ -112,6 +112,11 @@ svg {
   color: var(--paper-dim);
 }
 
+.masthead__tag-code {
+  font-size: 0.85em;
+  opacity: 0.6;
+}
+
 /* ---------- Hero (cover) ---------- */
 
 .hero {
